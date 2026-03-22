@@ -1,0 +1,626 @@
+Absolutely — here’s a **ready-to-use master prompt** you can paste into ChatGPT, Claude, Gemini, Cursor, Bolt, Lovable, or any AI code generator to create your **full-stack AI services business platform**.
+
+A couple of important notes first:
+
+Use **email OTP**, not “Gmail OTP.” Gmail itself is not an auth provider for OTP; your app should send OTP to the user’s email address through an email service. For phone OTP, use a verification provider such as Twilio Verify. For subscription billing and 3/6/12-month plans, Stripe Billing is a strong fit. For a modern full-stack app, **Next.js App Router** is current and production-ready, and Stripe officially supports recurring subscription lifecycles. ([Next.js][1])
+
+Also, Auth.js supports authentication patterns including email flows, but for **OTP by email + phone + activity tracking + admin dashboard + subscriptions**, a custom auth layer with database-backed verification is usually cleaner than relying only on a simple magic-link flow. Twilio Verify supports OTP verification workflows across channels including SMS and email. ([Auth.js][2])
+
+## Master architecture prompt
+
+```text
+Act as a senior solutions architect, senior full-stack engineer, UI/UX designer, database architect, DevOps engineer, and security architect.
+
+I want you to design and generate a complete production-ready full-stack web application for an AI services and digital solutions company.
+
+Business context:
+This company provides:
+1. Web application development services
+2. AI application setup and configuration
+3. ChatGPT, Gemini, and generative AI integration services
+4. Cloud and open cloud configuration services
+5. AI training programs for beginners, professionals, and businesses
+6. Vibe coding / AI-assisted development training
+7. Business automation services
+8. Workflow automation and process optimization
+9. Custom business software delivery
+10. Consulting packages and subscription-based service plans
+
+The platform must be a full business website + customer portal + admin portal + payment platform + lead capture + CRM-style tracking + user activity monitoring system.
+
+Build the solution with this preferred stack:
+- Frontend: Next.js latest with App Router, TypeScript, Tailwind CSS, shadcn/ui
+- Backend: Next.js server actions / API routes or NestJS if needed for scale
+- Database: PostgreSQL
+- ORM: Prisma
+- Authentication:
+  - Email OTP authentication
+  - Phone number OTP authentication
+  - Optional Google OAuth login
+  - Session management with JWT + secure httpOnly cookies
+- OTP/email service: Resend or SendGrid for email OTP
+- Phone OTP: Twilio Verify
+- Payments: Stripe
+- File storage: AWS S3 or Cloudinary
+- Analytics and logging: PostHog / custom audit logs
+- Deployment: Vercel for frontend, Railway/Supabase/AWS for backend/database
+- Admin dashboard: role-based secure admin panel
+- Optional queue/background jobs: BullMQ / Redis
+- Monitoring: Sentry
+- Security: rate limiting, bot protection, audit logs, OTP expiry, IP/device tracking
+
+Main objective:
+Create a complete software architecture and implementation plan for a business platform that allows users to:
+- Sign up using email OTP or phone OTP
+- Log in securely
+- Browse company services
+- View service details and pricing
+- Buy plans for 3 months, 6 months, and 12 months
+- Pay online
+- Book consultations
+- Submit project/service requests
+- Enroll in AI training programs
+- Access purchased services in a customer dashboard
+- View invoices, plan validity, payment history, and activity logs
+- Contact support
+- Track the progress of deliverables
+
+The system must also allow admins to:
+- Manage users
+- View all logins, OTP attempts, timestamps, devices, IPs, and activity history
+- Manage services, plans, pricing, and featured offerings
+- Manage training programs and modules
+- Manage orders, subscriptions, invoices, renewals, refunds, and cancellations
+- View analytics dashboards
+- Manage leads and consultation requests
+- Track customer lifecycle from inquiry to delivery
+- Assign project status
+- Upload learning materials/resources
+- See audit trails for every important action
+- Export reports
+
+Application modules required:
+
+1. Public Website
+- Home page
+- About page
+- Services page
+- Individual service detail pages
+- AI training page
+- Pricing page
+- Contact page
+- Book consultation page
+- Testimonials / case studies page
+- FAQ page
+- Blog / insights page
+- Careers or partnership page (optional)
+
+2. Authentication Module
+- Register with email OTP
+- Register with phone OTP
+- Login with email OTP
+- Login with phone OTP
+- Forgot password / passwordless option
+- OTP resend with cooldown
+- OTP expiration handling
+- Device/session tracking
+- Login history
+- Role-based access (customer, trainer, manager, admin, super admin)
+
+3. Customer Dashboard
+- Profile management
+- Personal details
+- Company details
+- Purchased plans
+- Active subscriptions
+- Service requests
+- Consultation history
+- Training enrollments
+- Learning resources
+- Payment history
+- Invoice download
+- Ticket/support section
+- Notifications
+- Activity history
+- Security settings
+
+4. Admin Dashboard
+- User management
+- Service management
+- Pricing plan management
+- Subscription management
+- Payment management
+- Order management
+- CRM lead pipeline
+- Consultation booking management
+- Project request management
+- Training course management
+- Content/blog CMS
+- User activity monitoring
+- Login history and audit logs
+- OTP verification logs
+- Analytics and revenue dashboard
+- Coupon/promo code management
+- Support and ticketing management
+
+5. Service Commerce Module
+For each service, allow:
+- Inquiry only
+- One-time purchase
+- Subscription purchase
+- Custom quotation request
+- Booking discovery call
+- Payment checkout
+- Post-payment onboarding
+
+6. Pricing and Billing
+Create 3 plan durations:
+- 3 months
+- 6 months
+- 12 months
+
+Each plan should support:
+- Name
+- Price
+- Description
+- Included features
+- Service limits
+- Renewal rules
+- Trial option
+- Discount logic
+- Coupon support
+- Tax handling
+- Invoice generation
+- Refund/cancellation policy
+- Upgrade/downgrade flow
+
+7. Activity Tracking / Audit Logging
+Track and store:
+- User registrations
+- OTP requests
+- OTP verification success/failure
+- Logins and logout timestamps
+- Browser/device info
+- IP address
+- Page visits
+- Service views
+- Button clicks for key CTAs
+- Purchases
+- Subscription changes
+- Profile changes
+- Support requests
+- Admin changes
+- Role changes
+- Payment events
+- Failed payment attempts
+- Suspicious activity
+- Account lock events
+
+8. Database Design
+Design all database schemas/tables with relationships for:
+- users
+- user_profiles
+- businesses
+- roles
+- permissions
+- sessions
+- auth_identities
+- otp_requests
+- login_events
+- activity_logs
+- services
+- service_categories
+- plans
+- subscriptions
+- orders
+- order_items
+- payments
+- invoices
+- refunds
+- coupons
+- consultations
+- leads
+- project_requests
+- training_programs
+- training_modules
+- enrollments
+- support_tickets
+- notifications
+- audit_logs
+- blog_posts
+- testimonials
+- uploaded_files
+
+For each table include:
+- fields
+- data types
+- constraints
+- indexes
+- foreign keys
+- created_at / updated_at
+- status columns where appropriate
+- soft delete strategy where needed
+
+9. Security Requirements
+Implement:
+- secure OTP generation and hashing
+- OTP expiry
+- resend throttling
+- rate limiting
+- CSRF protection
+- XSS and SQL injection protection
+- password hashing if password flow is used
+- JWT/session rotation
+- RBAC authorization
+- audit trail logging
+- IP/device anomaly detection
+- admin route hardening
+- webhook signature verification for Stripe
+- PII protection
+- encryption for sensitive fields
+- privacy consent tracking
+- terms and conditions acceptance
+- GDPR-style export/delete readiness
+
+10. UI/UX Requirements
+Design a premium, modern, trustworthy AI-company brand look:
+- dark/light mode
+- futuristic but professional
+- responsive mobile-first design
+- high-conversion landing pages
+- strong CTA sections
+- trust indicators
+- pricing cards
+- comparison tables
+- dashboard analytics widgets
+- clean tables and filters
+- user-friendly forms
+- elegant authentication flow
+- smooth onboarding journey
+
+Use pages/components such as:
+- hero banner
+- services grid
+- pricing cards
+- testimonials slider
+- FAQ accordion
+- consultation booking form
+- OTP modal
+- dashboard sidebar
+- analytics cards
+- activity timeline
+- invoice table
+- subscription card
+- support ticket panel
+
+11. API Design
+Create complete REST or hybrid API design for:
+- auth
+- otp send/verify
+- users
+- services
+- plans
+- subscriptions
+- payments
+- consultations
+- leads
+- training
+- tickets
+- analytics
+- admin actions
+- activity logs
+
+For each endpoint provide:
+- method
+- route
+- request payload
+- response format
+- auth rules
+- validation rules
+- error handling
+
+12. Payment Flow
+Implement complete payment architecture:
+- product/service purchase
+- subscription checkout
+- successful payment callback
+- failed payment handling
+- webhook reconciliation
+- invoice generation
+- renewal reminders
+- subscription upgrade/downgrade
+- cancellation
+- admin refund flow
+
+13. Booking and CRM Flow
+User journey should support:
+- visitor submits inquiry
+- lead is created
+- lead status changes
+- consultation is booked
+- service proposal created
+- payment completed
+- project/service starts
+- customer dashboard activated
+- delivery milestones tracked
+
+14. Deliverables expected from you
+Provide the output in the following order:
+
+A. System overview
+B. Recommended tech stack with justification
+C. High-level architecture diagram in text form
+D. End-to-end user flow
+E. Admin flow
+F. Database schema design in detail
+G. API architecture in detail
+H. Authentication and OTP flow design
+I. Payment and subscription flow
+J. Activity logging and audit design
+K. RBAC/permissions matrix
+L. Folder structure for frontend and backend
+M. Reusable component structure
+N. Wireframe/page structure
+O. UI design system guidance
+P. Security checklist
+Q. DevOps and deployment architecture
+R. Scaling strategy
+S. MVP scope vs Phase 2 vs Phase 3
+T. Suggested timeline
+U. Sample Prisma schema
+V. Sample backend route structure
+W. Sample Next.js project structure
+X. Environment variables list
+Y. Testing strategy
+Z. Final implementation roadmap
+
+Important instructions:
+- Make it production-grade, not just a demo
+- Make the design scalable for thousands of users
+- Keep code organization enterprise-level
+- Prefer clean architecture and modular design
+- Recommend best practices for AI-service businesses
+- Include subscription plans for 3, 6, and 12 months
+- Include activity logging for every critical action
+- Include lead generation + CRM style admin visibility
+- Include dashboards for both customers and admins
+- Include secure OTP-based auth
+- Include payment and invoicing support
+- Include audit-ready data storage
+- Include deliverable/project tracking capability
+- Include training/course module support
+- Include future readiness for mobile app APIs
+
+After the architecture, also generate:
+1. Detailed folder structure
+2. Prisma schema starter
+3. API route list
+4. Admin dashboard modules
+5. Customer dashboard modules
+6. Landing page section structure
+7. Stripe billing integration flow
+8. OTP verification sequence diagram in text
+9. ER diagram in Mermaid
+10. Step-by-step build plan from day 1 to deployment
+
+Make reasonable assumptions where needed and clearly label them.
+```
+
+## Best-practice architecture direction
+
+This is the stack I’d recommend for your use case:
+
+**Frontend**
+Next.js + TypeScript + Tailwind + shadcn/ui
+
+**Backend**
+Next.js full-stack for MVP, with modular APIs. Move heavy admin/reporting/jobs to NestJS later if scale grows.
+
+**Database**
+PostgreSQL + Prisma
+
+**Auth**
+Email OTP + Phone OTP + optional Google OAuth
+Use database tables for OTP requests, sessions, login events, and activity logs.
+
+**Payments**
+Stripe Billing for subscriptions with:
+
+* 3 months
+* 6 months
+* 12 months
+
+**Admin**
+Role-based admin portal:
+
+* Super Admin
+* Admin
+* Sales Manager
+* Support
+* Trainer
+* Operations
+
+**Tracking**
+Store:
+
+* login time
+* logout time
+* IP
+* browser/device
+* OTP status
+* service views
+* purchases
+* admin actions
+* support activity
+
+## High-level architecture
+
+```text
+Client Web App (Next.js)
+   |
+   |-- Public Website
+   |-- Auth Pages
+   |-- Customer Dashboard
+   |-- Admin Dashboard
+   |
+Server Layer (Next.js API / Server Actions)
+   |
+   |-- Auth Service
+   |-- OTP Service
+   |-- User Service
+   |-- Service Catalog Service
+   |-- Subscription/Billing Service
+   |-- CRM/Lead Service
+   |-- Consultation Booking Service
+   |-- Training Service
+   |-- Activity Log Service
+   |-- Notification Service
+   |-- Support Ticket Service
+   |
+Database Layer
+   |
+   |-- PostgreSQL
+   |-- Prisma ORM
+   |
+External Integrations
+   |
+   |-- Twilio Verify (phone OTP)
+   |-- Email provider for email OTP
+   |-- Stripe Billing
+   |-- S3 / Cloudinary
+   |-- Sentry
+   |-- Analytics
+```
+
+## Important product pages you should include
+
+Public side:
+
+* Home
+* Services
+* AI Integrations
+* Generative AI Training
+* Automation Solutions
+* Pricing
+* Book Consultation
+* Contact
+* Blog
+* Case Studies
+
+Customer dashboard:
+
+* My Profile
+* My Plans
+* My Purchases
+* Active Services
+* Training Programs
+* Invoices
+* Notifications
+* Support
+* Activity History
+
+Admin dashboard:
+
+* Users
+* OTP Logs
+* Login History
+* Services
+* Plans
+* Orders
+* Subscriptions
+* Revenue
+* Leads
+* Consultations
+* Deliveries/Projects
+* Tickets
+* Audit Logs
+* CMS
+
+## Recommended database tables
+
+Core:
+
+* users
+* profiles
+* roles
+* user_roles
+* sessions
+* otp_requests
+* login_events
+* activity_logs
+
+Business:
+
+* services
+* service_categories
+* pricing_plans
+* subscriptions
+* orders
+* order_items
+* invoices
+* payments
+* refunds
+
+CRM:
+
+* leads
+* consultation_bookings
+* proposals
+* customer_projects
+* milestones
+
+Training:
+
+* training_programs
+* modules
+* enrollments
+* resources
+* progress_tracking
+
+Support:
+
+* tickets
+* ticket_messages
+* notifications
+
+## Smart business idea for plans
+
+You mentioned buying “applications or services” for fixed durations. A strong model is:
+
+**Starter Plan**
+For learners / small users
+
+**Growth Plan**
+For startups / professionals
+
+**Enterprise Plan**
+For businesses
+
+Each available in:
+
+* 3 months
+* 6 months
+* 12 months
+
+That gives you both:
+
+* productized packages
+* custom quote option
+
+## One correction to your requirement
+
+Instead of saying:
+“Gmail OTP”
+
+Use:
+“Email OTP sent to registered email address”
+
+That is the technically correct wording.
+
+## Better short prompt version
+
+If you want a smaller prompt for faster AI generation, use this:
+
+```text
+Design a production-ready full-stack SaaS platform for an AI services company using Next.js, TypeScript, Tailwind, Prisma, PostgreSQL, email OTP, phone OTP, Stripe subscriptions, admin dashboard, customer portal, CRM lead tracking, training modules, activity logs, login history, audit trails, and 3/6/12 month pricing plans. Include system architecture, database schema, APIs, authentication flow, payment flow, admin modules, customer modules, page structure, folder structure, RBAC, security checklist, deployment plan, and step-by-step implementation roadmap.
+```

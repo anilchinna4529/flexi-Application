@@ -1,0 +1,1238 @@
+# AI Services Platform — Full Architecture Document
+
+## 1. Business Context
+
+A premium full-stack platform for an AI-first services company offering:
+
+* AI consulting and implementation
+* ChatGPT / Gemini / GenAI integration services
+* Web application development
+* Cloud and open-cloud configuration
+* AI training programs and vibe-coding workshops
+* Automation and business process optimization
+* Subscription-based service delivery for 3, 6, and 12 months
+
+The platform combines:
+
+1. Public marketing website
+2. Customer portal
+3. Admin/operations portal
+4. CRM and lead pipeline
+5. Training/LMS module
+6. Billing, subscriptions, invoices, and payments
+7. Activity logging, login history, audit trails, and analytics
+
+## 2. Architecture Principles
+
+* Open-source first
+* Premium UX and rich visuals
+* Modular monolith for MVP, clean migration path to services later
+* API-first design
+* Strong observability and auditability
+* Secure OTP/passwordless auth with email and phone support
+* External adapters only where real-world delivery requires it
+
+## 3. Recommended Stack
+
+### Core
+
+* **Frontend:** Next.js App Router, React, TypeScript, Tailwind CSS, shadcn/ui
+* **Backend:** NestJS (primary API) + Next.js BFF routes for frontend convenience
+* **Database:** PostgreSQL
+* **ORM:** Prisma ORM
+* **Cache / Queue:** Redis + BullMQ
+* **Object Storage:** MinIO (open-source, S3-compatible)
+* **Search (optional Phase 2):** Meilisearch
+* **CMS/blog (optional):** Payload CMS or custom admin content tables
+
+### Authentication (Open-source first)
+
+* **Auth engine:** SuperTokens (self-hosted OSS) for passwordless/OTP foundations
+* **Email OTP transport:** self-hosted SMTP adapter (Postal / Mailpit dev / standard SMTP provider in prod)
+* **Phone OTP:** custom adapter via telecom/SMS API gateway; OTP logic remains in-app
+* **Session strategy:** httpOnly cookies + rotating session / anti-CSRF protections
+
+### Analytics / Monitoring
+
+* **Product analytics:** PostHog (self-hosted OSS)
+* **Error monitoring:** Sentry-compatible alternative or self-hosted GlitchTip
+* **Logs:** structured JSON logs + audit tables
+* **Dashboards:** Metabase / Superset for internal business reporting
+
+### Payments
+
+* **Primary:** API-based payment provider abstraction
+* **Recommended global option:** Stripe adapter
+* **India-ready alternative:** Razorpay adapter
+* Payment layer is provider-agnostic
+
+## 4. Open-source Policy
+
+The platform should be built with open-source components wherever possible.
+
+### Fully open-source/self-hostable
+
+* Next.js
+* React
+* Tailwind CSS
+* shadcn/ui
+* NestJS
+* PostgreSQL
+* Prisma ORM
+* Redis
+* BullMQ
+* MinIO
+* PostHog
+* Metabase
+* SuperTokens OSS
+
+### Reality check on OTP and email/SMS delivery
+
+* Email OTP logic can be open-source, but production email delivery often still needs SMTP infrastructure.
+* Phone OTP logic can be open-source, but actual SMS delivery usually requires a telecom/SMS gateway or aggregator API.
+* So the architecture should use **adapter interfaces** for email and SMS providers.
+
+## 5. Premium Content and Visual Direction
+
+### Brand style
+
+* Dark premium aesthetic with optional light mode
+* Futuristic gradients, subtle glow, AI-grid backgrounds, glassmorphism, animated mesh backgrounds
+* Motion-guided hero sections and metrics counters
+
+### Rich content sections
+
+* Hero banner with animated AI metrics
+* Service showcase with premium cards
+* Case studies
+* AI readiness score widget
+* Automation ROI calculator
+* Interactive pricing plans
+* Testimonials
+* FAQ and blog insights
+* Animated dashboards and trust stats
+
+### Image strategy
+
+* Use open-license assets from Unsplash, Pexels, unDraw, Storyset, Simple Icons, Lucide icons
+* Use abstract AI backgrounds generated in CSS/SVG/canvas/WebGL
+* Avoid copyright-locked stock dependencies by default
+
+## 6. High-Level Architecture
+
+```text
+[ Next.js Web App ]
+  |- Public Website
+  |- Customer Dashboard
+  |- Admin Dashboard
+  |- Marketing CMS Views
+  |
+  |--calls--> [ NestJS API Layer ]
+                  |- Auth Module
+                  |- OTP Module
+                  |- User Module
+                  |- Service Catalog Module
+                  |- Lead/CRM Module
+                  |- Booking Module
+                  |- Subscription/Billing Module
+                  |- Training/LMS Module
+                  |- Ticketing Module
+                  |- Notification Module
+                  |- Audit/Activity Module
+                  |- Analytics Module
+                  |- CMS Module
+                  |- Integration Adapter Module
+                  |
+                  |---> PostgreSQL
+                  |---> Redis
+                  |---> MinIO
+                  |---> PostHog
+                  |---> Payment Provider Adapter
+                  |---> SMTP Adapter
+                  |---> SMS Adapter
+```
+
+## 7. Main User Roles
+
+* Visitor
+* Lead
+* Customer
+* Trainer
+* Sales Manager
+* Support Agent
+* Operations Manager
+* Admin
+* Super Admin
+
+## 8. Core User Journeys
+
+### Visitor to customer
+
+1. Visitor lands on premium marketing site
+2. Browses services / AI training / pricing
+3. Requests consultation or signs up
+4. Verifies with email OTP or phone OTP
+5. Creates account profile
+6. Purchases plan or requests custom quote
+7. Completes payment
+8. Gets dashboard access
+9. Tracks service progress / training / invoices / support
+
+### Admin operations
+
+1. Admin reviews lead pipeline
+2. Qualifies inquiry
+3. Creates service proposal or links plan
+4. Confirms payment / onboarding
+5. Assigns delivery milestones or training access
+6. Monitors user activity, logins, OTP attempts, and tickets
+7. Reviews analytics and exports reports
+
+## 9. Modules
+
+### Public website
+
+* Home
+* About
+* Services
+* Service detail pages
+* AI training page
+* Pricing
+* Consultation booking
+* Contact
+* Blog
+* Case studies
+* Careers / partners
+
+### Customer portal
+
+* Dashboard overview
+* Profile and company details
+* Orders and subscriptions
+* Purchased services
+* Project milestones
+* Training enrollments
+* Resources/downloads
+* Tickets/support
+* Notifications
+* Security settings
+* Activity history
+* Invoices and payments
+
+### Admin portal
+
+* Dashboard analytics
+* User management
+* Role management
+* Services and plan management
+* Leads and consultations
+* Orders, payments, subscriptions
+* Training programs and modules
+* Blog/CMS management
+* Tickets and support SLAs
+* Login history and OTP logs
+* Activity logs and audit trails
+* Reports / exports
+
+## 10. Database Design
+
+### Main entities
+
+* users
+* user_profiles
+* organizations
+* roles
+* permissions
+* user_roles
+* sessions
+* otp_requests
+* login_events
+* activity_logs
+* audit_logs
+* services
+* service_categories
+* service_media
+* plans
+* plan_features
+* subscriptions
+* orders
+* order_items
+* payments
+* invoices
+* refunds
+* coupons
+* leads
+* consultations
+* project_requests
+* projects
+* milestones
+* training_programs
+* training_modules
+* enrollments
+* learning_resources
+* support_tickets
+* ticket_messages
+* notifications
+* blog_posts
+* testimonials
+* uploaded_files
+* provider_webhook_events
+
+## 11. ER Diagram (Mermaid)
+
+```mermaid
+erDiagram
+  USERS ||--o{ USER_PROFILES : has
+  USERS ||--o{ SESSIONS : has
+  USERS ||--o{ OTP_REQUESTS : requests
+  USERS ||--o{ LOGIN_EVENTS : creates
+  USERS ||--o{ ACTIVITY_LOGS : generates
+  USERS ||--o{ AUDIT_LOGS : performs
+  USERS ||--o{ USER_ROLES : assigned
+  ROLES ||--o{ USER_ROLES : maps
+  ROLES ||--o{ ROLE_PERMISSIONS : grants
+  PERMISSIONS ||--o{ ROLE_PERMISSIONS : maps
+  USERS ||--o{ LEADS : owns
+  USERS ||--o{ CONSULTATIONS : books
+  USERS ||--o{ ORDERS : places
+  USERS ||--o{ SUBSCRIPTIONS : owns
+  USERS ||--o{ PAYMENTS : makes
+  USERS ||--o{ INVOICES : receives
+  USERS ||--o{ SUPPORT_TICKETS : raises
+  USERS ||--o{ ENROLLMENTS : joins
+  USERS ||--o{ NOTIFICATIONS : receives
+  SERVICE_CATEGORIES ||--o{ SERVICES : groups
+  SERVICES ||--o{ PLANS : offers
+  PLANS ||--o{ PLAN_FEATURES : includes
+  ORDERS ||--o{ ORDER_ITEMS : contains
+  SERVICES ||--o{ ORDER_ITEMS : sold_as
+  PLANS ||--o{ ORDER_ITEMS : priced_by
+  ORDERS ||--o{ PAYMENTS : paid_by
+  ORDERS ||--o{ INVOICES : billed_as
+  SUBSCRIPTIONS }o--|| PLANS : based_on
+  SUBSCRIPTIONS }o--|| USERS : belongs_to
+  PAYMENTS ||--o{ REFUNDS : may_have
+  COUPONS ||--o{ ORDERS : applied_to
+  USERS ||--o{ PROJECT_REQUESTS : submits
+  PROJECT_REQUESTS ||--o{ PROJECTS : becomes
+  PROJECTS ||--o{ MILESTONES : contains
+  TRAINING_PROGRAMS ||--o{ TRAINING_MODULES : has
+  TRAINING_PROGRAMS ||--o{ ENROLLMENTS : purchased_in
+  TRAINING_PROGRAMS ||--o{ LEARNING_RESOURCES : includes
+  SUPPORT_TICKETS ||--o{ TICKET_MESSAGES : contains
+  USERS ||--o{ UPLOADED_FILES : uploads
+  SERVICES ||--o{ SERVICE_MEDIA : has
+```
+
+## 12. Folder Structure
+
+```text
+ai-services-platform/
+├─ apps/
+│  ├─ web/                             # Next.js app
+│  │  ├─ app/
+│  │  │  ├─ (marketing)/
+│  │  │  │  ├─ page.tsx
+│  │  │  │  ├─ about/page.tsx
+│  │  │  │  ├─ services/page.tsx
+│  │  │  │  ├─ services/[slug]/page.tsx
+│  │  │  │  ├─ training/page.tsx
+│  │  │  │  ├─ pricing/page.tsx
+│  │  │  │  ├─ contact/page.tsx
+│  │  │  │  ├─ consultation/page.tsx
+│  │  │  │  ├─ blog/page.tsx
+│  │  │  │  └─ case-studies/page.tsx
+│  │  │  ├─ (auth)/
+│  │  │  │  ├─ sign-in/page.tsx
+│  │  │  │  ├─ sign-up/page.tsx
+│  │  │  │  ├─ verify-otp/page.tsx
+│  │  │  │  └─ callback/page.tsx
+│  │  │  ├─ (customer)/dashboard/
+│  │  │  │  ├─ page.tsx
+│  │  │  │  ├─ profile/page.tsx
+│  │  │  │  ├─ subscriptions/page.tsx
+│  │  │  │  ├─ orders/page.tsx
+│  │  │  │  ├─ invoices/page.tsx
+│  │  │  │  ├─ projects/page.tsx
+│  │  │  │  ├─ training/page.tsx
+│  │  │  │  ├─ support/page.tsx
+│  │  │  │  └─ security/page.tsx
+│  │  │  ├─ admin/
+│  │  │  │  ├─ page.tsx
+│  │  │  │  ├─ users/page.tsx
+│  │  │  │  ├─ leads/page.tsx
+│  │  │  │  ├─ services/page.tsx
+│  │  │  │  ├─ plans/page.tsx
+│  │  │  │  ├─ subscriptions/page.tsx
+│  │  │  │  ├─ payments/page.tsx
+│  │  │  │  ├─ training/page.tsx
+│  │  │  │  ├─ tickets/page.tsx
+│  │  │  │  ├─ analytics/page.tsx
+│  │  │  │  ├─ audit-logs/page.tsx
+│  │  │  │  └─ cms/page.tsx
+│  │  ├─ components/
+│  │  │  ├─ marketing/
+│  │  │  ├─ dashboard/
+│  │  │  ├─ admin/
+│  │  │  ├─ auth/
+│  │  │  ├─ ai-visuals/
+│  │  │  └─ shared/
+│  │  ├─ lib/
+│  │  │  ├─ api-client.ts
+│  │  │  ├─ auth.ts
+│  │  │  ├─ permissions.ts
+│  │  │  └─ utils.ts
+│  │  └─ styles/
+│  └─ api/                             # NestJS app
+│     ├─ src/
+│     │  ├─ modules/
+│     │  │  ├─ auth/
+│     │  │  ├─ otp/
+│     │  │  ├─ users/
+│     │  │  ├─ roles/
+│     │  │  ├─ services/
+│     │  │  ├─ plans/
+│     │  │  ├─ subscriptions/
+│     │  │  ├─ orders/
+│     │  │  ├─ payments/
+│     │  │  ├─ invoices/
+│     │  │  ├─ leads/
+│     │  │  ├─ consultations/
+│     │  │  ├─ projects/
+│     │  │  ├─ training/
+│     │  │  ├─ support/
+│     │  │  ├─ notifications/
+│     │  │  ├─ analytics/
+│     │  │  ├─ audit/
+│     │  │  ├─ cms/
+│     │  │  └─ integrations/
+│     │  ├─ common/
+│     │  ├─ config/
+│     │  └─ main.ts
+├─ packages/
+│  ├─ ui/
+│  ├─ config/
+│  ├─ types/
+│  └─ eslint-config/
+├─ prisma/
+│  ├─ schema.prisma
+│  └─ migrations/
+├─ docs/
+└─ docker/
+```
+
+## 13. Prisma Schema Starter
+
+```prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  PENDING
+  SUSPENDED
+  DELETED
+}
+
+enum OtpChannel {
+  EMAIL
+  PHONE
+}
+
+enum OtpPurpose {
+  SIGNUP
+  LOGIN
+  VERIFY_CONTACT
+  RESET
+}
+
+enum OtpStatus {
+  SENT
+  VERIFIED
+  EXPIRED
+  FAILED
+  BLOCKED
+}
+
+enum PlanDuration {
+  THREE_MONTHS
+  SIX_MONTHS
+  TWELVE_MONTHS
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+  PAUSED
+}
+
+enum OrderStatus {
+  DRAFT
+  PENDING
+  PAID
+  FAILED
+  CANCELED
+  FULFILLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id                String           @id @default(cuid())
+  email             String?          @unique
+  phone             String?          @unique
+  fullName          String
+  passwordHash      String?
+  status            UserStatus       @default(PENDING)
+  emailVerifiedAt   DateTime?
+  phoneVerifiedAt   DateTime?
+  lastLoginAt       DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  deletedAt         DateTime?
+
+  profile           UserProfile?
+  sessions          Session[]
+  otpRequests       OtpRequest[]
+  loginEvents       LoginEvent[]
+  activityLogs      ActivityLog[]
+  auditLogs         AuditLog[]
+  roles             UserRole[]
+  orders            Order[]
+  subscriptions     Subscription[]
+  payments          Payment[]
+  invoices          Invoice[]
+  leads             Lead[]
+  consultations     Consultation[]
+  projectRequests   ProjectRequest[]
+  enrollments       Enrollment[]
+  tickets           SupportTicket[]
+  notifications     Notification[]
+  uploads           UploadedFile[]
+}
+
+model UserProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  companyName       String?
+  jobTitle          String?
+  website           String?
+  country           String?
+  city              String?
+  addressLine1      String?
+  addressLine2      String?
+  postalCode        String?
+  avatarUrl         String?
+  bio               String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  description String?
+  users       UserRole[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  key         String           @unique
+  description String?
+  roles       RolePermission[]
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+}
+
+model RolePermission {
+  id            String      @id @default(cuid())
+  roleId        String
+  permissionId  String
+
+  role          Role        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission    Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+model Session {
+  id             String   @id @default(cuid())
+  userId         String
+  sessionToken   String   @unique
+  refreshToken   String?  @unique
+  ipAddress      String?
+  userAgent      String?
+  deviceId       String?
+  lastSeenAt     DateTime?
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model OtpRequest {
+  id             String      @id @default(cuid())
+  userId         String?
+  channel        OtpChannel
+  purpose        OtpPurpose
+  destination    String
+  otpHash        String
+  status         OtpStatus   @default(SENT)
+  attempts       Int         @default(0)
+  resendCount    Int         @default(0)
+  expiresAt      DateTime
+  verifiedAt     DateTime?
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime    @default(now())
+
+  user           User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([destination, purpose])
+  @@index([userId])
+}
+
+model LoginEvent {
+  id             String   @id @default(cuid())
+  userId         String?
+  success        Boolean
+  method         String
+  ipAddress      String?
+  userAgent      String?
+  deviceId       String?
+  reason         String?
+  createdAt      DateTime @default(now())
+
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}
+
+model ActivityLog {
+  id             String   @id @default(cuid())
+  userId         String?
+  actorType      String
+  action         String
+  entityType     String?
+  entityId       String?
+  metadata       Json?
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime @default(now())
+
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([entityType, entityId])
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  userId         String?
+  action         String
+  targetType     String
+  targetId       String?
+  beforeData     Json?
+  afterData      Json?
+  createdAt      DateTime @default(now())
+
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model ServiceCategory {
+  id             String    @id @default(cuid())
+  name           String    @unique
+  slug           String    @unique
+  description    String?
+  services       Service[]
+}
+
+model Service {
+  id             String          @id @default(cuid())
+  categoryId     String
+  name           String
+  slug           String          @unique
+  shortDesc      String
+  longDesc       String
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  category       ServiceCategory @relation(fields: [categoryId], references: [id])
+  plans          Plan[]
+  media          ServiceMedia[]
+  orderItems     OrderItem[]
+}
+
+model ServiceMedia {
+  id             String   @id @default(cuid())
+  serviceId      String
+  type           String
+  url            String
+  altText        String?
+  sortOrder      Int      @default(0)
+
+  service        Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+}
+
+model Plan {
+  id             String          @id @default(cuid())
+  serviceId      String
+  name           String
+  slug           String          @unique
+  duration       PlanDuration
+  priceAmount    Decimal         @db.Decimal(10, 2)
+  currency       String          @default("USD")
+  description    String?
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  service        Service         @relation(fields: [serviceId], references: [id])
+  features       PlanFeature[]
+  subscriptions  Subscription[]
+  orderItems     OrderItem[]
+}
+
+model PlanFeature {
+  id             String   @id @default(cuid())
+  planId         String
+  title          String
+  description    String?
+  sortOrder      Int      @default(0)
+
+  plan           Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id                    String             @id @default(cuid())
+  userId                String
+  planId                String
+  status                SubscriptionStatus @default(ACTIVE)
+  startAt               DateTime
+  endAt                 DateTime
+  cancelAt              DateTime?
+  externalProvider      String?
+  externalSubscriptionId String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                  Plan               @relation(fields: [planId], references: [id])
+
+  @@index([userId, status])
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  userId         String
+  orderNumber    String      @unique
+  status         OrderStatus @default(PENDING)
+  subtotal       Decimal     @db.Decimal(10, 2)
+  taxAmount      Decimal     @db.Decimal(10, 2)
+  discountAmount Decimal     @db.Decimal(10, 2)
+  totalAmount    Decimal     @db.Decimal(10, 2)
+  currency       String      @default("USD")
+  couponCode     String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items          OrderItem[]
+  payments       Payment[]
+  invoices       Invoice[]
+}
+
+model OrderItem {
+  id             String   @id @default(cuid())
+  orderId        String
+  serviceId      String?
+  planId         String?
+  title          String
+  quantity       Int      @default(1)
+  unitPrice      Decimal  @db.Decimal(10, 2)
+  totalPrice     Decimal  @db.Decimal(10, 2)
+
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  service        Service? @relation(fields: [serviceId], references: [id])
+  plan           Plan?    @relation(fields: [planId], references: [id])
+}
+
+model Payment {
+  id             String        @id @default(cuid())
+  userId         String
+  orderId        String
+  provider       String
+  providerRef    String?
+  amount         Decimal       @db.Decimal(10, 2)
+  currency       String        @default("USD")
+  status         PaymentStatus @default(PENDING)
+  paidAt         DateTime?
+  metadata       Json?
+  createdAt      DateTime      @default(now())
+
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order          Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  refunds        Refund[]
+}
+
+model Invoice {
+  id             String   @id @default(cuid())
+  userId         String
+  orderId        String
+  invoiceNumber  String   @unique
+  amount         Decimal  @db.Decimal(10, 2)
+  currency       String   @default("USD")
+  pdfUrl         String?
+  issuedAt       DateTime @default(now())
+  dueAt          DateTime?
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Refund {
+  id             String   @id @default(cuid())
+  paymentId      String
+  amount         Decimal  @db.Decimal(10, 2)
+  reason         String?
+  status         String
+  createdAt      DateTime @default(now())
+
+  payment        Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+}
+
+model Lead {
+  id             String   @id @default(cuid())
+  userId         String?
+  source         String?
+  name           String
+  email          String?
+  phone          String?
+  company        String?
+  interest       String?
+  status         String   @default("NEW")
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model Consultation {
+  id             String   @id @default(cuid())
+  userId         String?
+  scheduledAt    DateTime
+  durationMin    Int      @default(30)
+  status         String   @default("BOOKED")
+  notes          String?
+  createdAt      DateTime @default(now())
+
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model ProjectRequest {
+  id             String   @id @default(cuid())
+  userId         String
+  title          String
+  description    String
+  status         String   @default("SUBMITTED")
+  createdAt      DateTime @default(now())
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects       Project[]
+}
+
+model Project {
+  id               String   @id @default(cuid())
+  projectRequestId String
+  name             String
+  status           String   @default("ONBOARDING")
+  startAt          DateTime?
+  endAt            DateTime?
+  createdAt        DateTime @default(now())
+
+  request          ProjectRequest @relation(fields: [projectRequestId], references: [id], onDelete: Cascade)
+  milestones       Milestone[]
+}
+
+model Milestone {
+  id             String   @id @default(cuid())
+  projectId      String
+  title          String
+  status         String   @default("PENDING")
+  dueAt          DateTime?
+  createdAt      DateTime @default(now())
+
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model TrainingProgram {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  description    String
+  level          String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  modules        TrainingModule[]
+  enrollments    Enrollment[]
+  resources      LearningResource[]
+}
+
+model TrainingModule {
+  id                String   @id @default(cuid())
+  trainingProgramId String
+  title             String
+  content           String?
+  videoUrl          String?
+  sortOrder         Int      @default(0)
+
+  program           TrainingProgram @relation(fields: [trainingProgramId], references: [id], onDelete: Cascade)
+}
+
+model Enrollment {
+  id                String   @id @default(cuid())
+  userId            String
+  trainingProgramId String
+  status            String   @default("ACTIVE")
+  progressPct       Int      @default(0)
+  enrolledAt        DateTime @default(now())
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  program           TrainingProgram @relation(fields: [trainingProgramId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, trainingProgramId])
+}
+
+model LearningResource {
+  id                String   @id @default(cuid())
+  trainingProgramId String
+  title             String
+  url               String
+  type              String
+
+  program           TrainingProgram @relation(fields: [trainingProgramId], references: [id], onDelete: Cascade)
+}
+
+model SupportTicket {
+  id             String       @id @default(cuid())
+  userId         String
+  subject        String
+  status         TicketStatus @default(OPEN)
+  priority       String       @default("MEDIUM")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages       TicketMessage[]
+}
+
+model TicketMessage {
+  id             String   @id @default(cuid())
+  ticketId       String
+  senderUserId   String?
+  message        String
+  createdAt      DateTime @default(now())
+
+  ticket         SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id             String   @id @default(cuid())
+  userId         String
+  type           String
+  title          String
+  body           String
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UploadedFile {
+  id             String   @id @default(cuid())
+  userId         String?
+  storageKey     String
+  fileName       String
+  mimeType       String
+  sizeBytes      Int
+  createdAt      DateTime @default(now())
+
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+```
+
+## 14. API List
+
+### Auth and OTP
+
+* `POST /api/v1/auth/register/email/request-otp`
+* `POST /api/v1/auth/register/email/verify-otp`
+* `POST /api/v1/auth/register/phone/request-otp`
+* `POST /api/v1/auth/register/phone/verify-otp`
+* `POST /api/v1/auth/login/email/request-otp`
+* `POST /api/v1/auth/login/email/verify-otp`
+* `POST /api/v1/auth/login/phone/request-otp`
+* `POST /api/v1/auth/login/phone/verify-otp`
+* `POST /api/v1/auth/logout`
+* `GET /api/v1/auth/session`
+* `POST /api/v1/auth/refresh`
+
+### Users
+
+* `GET /api/v1/users/me`
+* `PATCH /api/v1/users/me`
+* `GET /api/v1/users/me/activity`
+* `GET /api/v1/users/me/security-sessions`
+* `DELETE /api/v1/users/me/security-sessions/:sessionId`
+
+### Public services / content
+
+* `GET /api/v1/services`
+* `GET /api/v1/services/:slug`
+* `GET /api/v1/service-categories`
+* `GET /api/v1/plans`
+* `GET /api/v1/training-programs`
+* `GET /api/v1/training-programs/:slug`
+* `GET /api/v1/blog-posts`
+* `GET /api/v1/blog-posts/:slug`
+* `POST /api/v1/contact`
+* `POST /api/v1/leads`
+* `POST /api/v1/consultations`
+
+### Commerce
+
+* `POST /api/v1/orders`
+* `GET /api/v1/orders/:id`
+* `GET /api/v1/orders/me`
+* `POST /api/v1/checkout/session`
+* `POST /api/v1/payments/webhook/:provider`
+* `GET /api/v1/subscriptions/me`
+* `POST /api/v1/subscriptions/:id/cancel`
+* `POST /api/v1/subscriptions/:id/upgrade`
+* `POST /api/v1/subscriptions/:id/renew`
+* `GET /api/v1/invoices/me`
+
+### Customer project delivery
+
+* `POST /api/v1/project-requests`
+* `GET /api/v1/project-requests/me`
+* `GET /api/v1/projects/me`
+* `GET /api/v1/projects/:id/milestones`
+
+### Training
+
+* `POST /api/v1/enrollments`
+* `GET /api/v1/enrollments/me`
+* `GET /api/v1/training-resources/:programId`
+* `POST /api/v1/enrollments/:id/progress`
+
+### Support
+
+* `POST /api/v1/tickets`
+* `GET /api/v1/tickets/me`
+* `GET /api/v1/tickets/:id`
+* `POST /api/v1/tickets/:id/messages`
+
+### Admin
+
+* `GET /api/v1/admin/users`
+* `GET /api/v1/admin/users/:id`
+* `PATCH /api/v1/admin/users/:id`
+* `GET /api/v1/admin/leads`
+* `PATCH /api/v1/admin/leads/:id`
+* `GET /api/v1/admin/services`
+* `POST /api/v1/admin/services`
+* `PATCH /api/v1/admin/services/:id`
+* `GET /api/v1/admin/plans`
+* `POST /api/v1/admin/plans`
+* `PATCH /api/v1/admin/plans/:id`
+* `GET /api/v1/admin/orders`
+* `GET /api/v1/admin/payments`
+* `GET /api/v1/admin/subscriptions`
+* `GET /api/v1/admin/consultations`
+* `PATCH /api/v1/admin/consultations/:id`
+* `GET /api/v1/admin/training-programs`
+* `POST /api/v1/admin/training-programs`
+* `GET /api/v1/admin/tickets`
+* `PATCH /api/v1/admin/tickets/:id`
+* `GET /api/v1/admin/activity-logs`
+* `GET /api/v1/admin/audit-logs`
+* `GET /api/v1/admin/analytics/overview`
+* `GET /api/v1/admin/reports/revenue`
+* `GET /api/v1/admin/reports/users`
+
+## 15. AI Metrics and Premium Visual Widgets
+
+Use visually rich but honest metrics panels such as:
+
+* Automation hours saved
+* Avg onboarding time
+* Project delivery rate
+* Training completion rate
+* AI adoption score
+* Prompt quality score
+* Workflow efficiency uplift
+* Lead-to-customer conversion rate
+
+### Background / algorithm visuals
+
+* Animated particle graph background
+* Neural network SVG grid
+* flowing line-chart hero background
+* subtle AI node connections using canvas/WebGL
+* live KPI cards with count-up animations
+
+These are presentation features, not false ML claims.
+
+## 16. Payment Abstraction Strategy
+
+Because you requested open-source first, payments must be modular:
+
+* `PaymentProvider` interface
+* `StripePaymentProvider`
+* `RazorpayPaymentProvider`
+* `ManualInvoiceProvider` for enterprise/offline deals
+
+Plans supported:
+
+* 3 months
+* 6 months
+* 12 months
+
+## 17. Security Checklist
+
+* Hash OTP before storing
+* OTP TTL and resend cooldown
+* login throttling and IP-based rate limiting
+* RBAC + permission guards
+* CSRF protection for cookie auth
+* secure headers + CSP
+* signed webhooks for payment events
+* audit trail for admin actions
+* soft delete and export/delete readiness
+* encryption for sensitive fields as needed
+* anomaly flags for repeated OTP failures / suspicious IPs
+
+## 18. MVP vs Later Phases
+
+### MVP
+
+* Marketing website
+* Email OTP + phone OTP flow
+* Customer dashboard
+* Admin dashboard
+* Services/plans/pricing
+* Orders/payments/subscriptions
+* Leads/consultations
+* Training programs basic module
+* Support tickets
+* Activity and audit logs
+
+### Phase 2
+
+* AI readiness assessment tool
+* ROI calculator
+* multi-tenant organizations
+* richer LMS progress and quizzes
+* referral system
+* coupons and promotions
+* analytics dashboards via Metabase embedding
+
+### Phase 3
+
+* mobile app APIs
+* white-label tenant portals
+* workflow builder / automation designer
+* AI assistant inside dashboard
+* knowledge base and customer success automation
+
+## 19. Recommended Build Order
+
+1. Repo and monorepo setup
+2. Design system and premium marketing shell
+3. Prisma schema and migrations
+4. Auth + OTP flows
+5. RBAC and admin shell
+6. Services/plans/content management
+7. Orders, checkout, payments, invoices
+8. Customer dashboard
+9. Leads, consultations, project flow
+10. Training module
+11. Support/ticketing
+12. Activity logs and analytics
+13. hardening, testing, deployment
+
+## 20. Key Assumptions
+
+* Business sells both fixed plans and custom service engagements
+* Some services are subscription-like while others are milestone/project-based
+* Phone OTP still needs a real SMS delivery channel in production
+* Payment integration may vary by country and provider
+* Open-source first does not mean zero external APIs forever; it means provider abstraction with self-hostable defaults where feasible
+
+ull system architecture
+ER diagram in Mermaid
+monorepo folder structure
+Prisma schema starter
+API list
+premium UI/content direction
+open-source-first stack
+adapter-based payment / email / SMS integration model
+
+A few important implementation notes I baked into the document:
+
+Next.js App Router is used as the frontend foundation. Next.js documents App Router as the newer router for modern React features.
+Prisma ORM + PostgreSQL is used for the database layer; Prisma’s docs describe Prisma ORM as open-source and type-safe for Node.js/TypeScript apps.
+For OTP/passwordless auth, I aligned the design around an open-source-first approach using a passwordless pattern that supports one-time codes via email/phone flows. SuperTokens documents passwordless auth using OTP or magic links and supports email/SMS behavior customization.
+For subscriptions, the architecture uses a provider abstraction, with Stripe as the recommended adapter because Stripe Billing supports recurring subscriptions and Checkout-based subscription flows well.
+
+One practical note: I also added your requirement that the app should be open-source first, but for real production phone OTP and payment processing, you will usually still need an external delivery/provider layer. The document handles that by using adapter interfaces so you can plug in Stripe/Razorpay, SMTP, or SMS gateways without locking the platform to one vendor.
+
+The document also now includes your added requirement for:
+
+rich premium website content
+AI-style background graphics and metrics sections
+animated algorithm/neural-network-style visual design
+open-license image/content strategy
+all-open-source core platform choices where feasible
